@@ -58,9 +58,6 @@ Place your target glass plate image folders in the code directory, navigate into
 ```bash
 cd code/
 python main.py
-
 ```
 
 The routine completes execution in approximately **2–3 minutes** across all 17 multi-layered files, generating structured outputs inside the local `output/` subfolder.
-
-```
