@@ -45,7 +45,7 @@ The pipeline benchmarks alignment using two independent similarity scoring funct
 ## Installation & Execution
 
 ### 1. Requirements Configuration
-Ensure you are running an environment with Python 3.7+ along with NumPy and scikit-image installed[cite: 33, 34]:
+Ensure you are running an environment with Python 3.7+ along with NumPy and scikit-image installed:
 ```bash
 pip install numpy scikit-image
 
