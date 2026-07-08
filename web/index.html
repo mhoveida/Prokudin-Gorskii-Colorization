@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorizing the Prokudin-Gorskii Photo Collection</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: #f5f7fa;
+        color: #2d3748;
+        line-height: 1.7;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .wrapper {
+        max-width: 100%;
+        margin: 0 auto;
+        background: white;
+    }
+    
+    header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 80px 60px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        position: relative;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: center;
+    }
+    
+    header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(255,255,255,0.08) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    header > * {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .header-content {
+        text-align: left;
+    }
+    
+    .header-image {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    
+    .header-image img {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        border: 4px solid rgba(255,255,255,0.2);
+    }
+    
+    header h1 {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+        font-weight: 800;
+        color: white;
+        letter-spacing: -0.5px;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    header p {
+        font-size: 1.3em;
+        color: rgba(255,255,255,0.95);
+        line-height: 1.8;
+    }
+    
+    header p:last-child {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        font-size: 1.1em;
+    }
+    
+    .content {
+        padding: 50px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    section {
+        margin-bottom: 60px;
+    }
+    
+    h2 {
+        color: #2d3748;
+        font-size: 2em;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #667eea;
+        display: inline-block;
+    }
+    
+    h3 {
+        color: #4a5568;
+        font-size: 1.5em;
+        margin: 30px 0 15px 0;
+    }
+    
+    p, li {
+        font-size: 1.05em;
+        margin-bottom: 15px;
+        color: #4a5568;
+    }
+    
+    ul {
+        margin-left: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .highlight-box {
+        background: #e0e4f5;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 4px;
+    }
+    
+    .comparison-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 30px 0;
+        padding: 20px;
+        background: #edf2f7;
+        border-radius: 8px;
+    }
+    
+    .comparison-item {
+        padding: 15px;
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .comparison-item h4 {
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.95em;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    thead tr {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    th, td {
+        padding: 15px;
+        text-align: center;
+    }
+    
+    tbody tr {
+        border-bottom: 1px solid #e2e8f0;
+        transition: background 0.3s;
+    }
+    
+    tbody tr:hover {
+        background: #f7fafc;
+    }
+    
+    tbody tr:last-child {
+        border-bottom: none;
+    }
+    
+    .image-gallery-2col {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        margin: 30px 0;
+    }
+    
+    .image-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .image-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .image-card img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .image-card p {
+        padding: 15px;
+        text-align: center;
+        font-weight: 600;
+        color: #2d3748;
+        background: #f7fafc;
+        margin: 0;
+    }
+    
+    .before-after {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 30px 0;
+        padding: 20px;
+        background: #f7fafc;
+        border-radius: 8px;
+    }
+    
+    .before-after-item {
+        text-align: center;
+    }
+    
+    .before-after-item h4 {
+        margin-bottom: 15px;
+        color: #2d3748;
+    }
+    
+    .before-after-item img {
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .metric-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #667eea;
+        color: white;
+        border-radius: 12px;
+        font-size: 0.85em;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+    
+    .note {
+        background: #fff5f5;
+        border-left: 4px solid #fc8181;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+    }
+    code {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-size: 1em;
+            color: #d53f8c;
+            padding: 2px 2px;
+            border-radius: 4px;
+        }
+    
+    @media (max-width: 768px) {
+        header {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        header h1 {
+            font-size: 1.8em;
+        }
+        
+        .content {
+            padding: 30px 20px;
+        }
+        
+        .comparison-box,
+        .before-after,
+        .image-gallery-2col {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="header-content">
+                <h1>Images of the Russian Empire</h1>
+                <p>Colorizing the Prokudin-Gorskii Photo Collection</p>
+                <p style="margin-top: 10px; font-size: 1em;">COMS 4732 Computer Vision II | Project 1</p>
+                <p style="margin-top: 5px; font-size: 1em;">Maddison Hoveida | UNI: mh4572</p>
+            </div>
+            <div class="header-image">
+                <img src="assets/hero.png" alt="Prokudin-Gorskii colorized photo">
+            </div>
+        </header>
+
+        <div class="content">
+            <section>
+                <h2>Overview</h2>
+                <p>
+                    Sergei Prokudin-Gorskii was a photographer who traveled across the Russian Empire in the early 1900s, 
+                    capturing thousands of images using three separate glass plate negatives, one each through red, green, and blue filters.
+                    This project automatically aligns these three black and white channels to produce original vivid color images. 
+ 
+                </p>
+                <p>
+                    The goal is to fix the temporal displacement from sequential exposure process and recreate 
+                    the original scene as it would have normally appear to the human eye.
+                </p>
+            </section>
+
+            <section>
+                <h2>The Problem: Unaligned Images</h2>
+                <p>
+                    If we just stack the three color channels without aligning them, 
+                    the image looks blurry and shows colored edges. 
+                    Here’s what the original unaligned images look like:
+                </p>
+
+                <div class="image-gallery-2col">
+                    <div class="image-card">
+                        <img src="assets/cathedral_unaligned.jpg" alt="cathedral unaligned">
+                        <p>Cathedral - Unaligned</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/monastery_unaligned.jpg" alt="monastery unaligned">
+                        <p>Monastery - Unaligned</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/tobolsk_unaligned.jpg" alt="tobolsk unaligned">
+                        <p>Tobolsk - Unaligned</p>
+                    </div>
+                </div>
+
+                <p>
+                    You can see colored halos around the edges and the image looks blurry. 
+                    This happens because the three photos were taken a few seconds apart, 
+                    and small camera movements caused them to be misaligned.
+                </p>
+            </section>
+
+            <section>
+                <h2>Solution</h2>
+                
+                <h3>Algorithm Overview</h3>
+                <p>I implemented a two-stage alignment system:</p>
+                <ul>
+                    <li><strong>Single-Scale Exhaustive Search:</strong> For small JPG images, I search over a [-15, 15] pixel window to find the best alignment</li>
+                    <li><strong>Image Pyramid (Coarse-to-Fine):</strong> For large TIF images, I use a pyramid approach: I downsample the image, align it at a low resolution, and then gradually refine the alignment at higher resolutions.</li>
+                </ul>
+
+                <div class="comparison-box">
+                    <div class="comparison-item">
+                        <h4> Metric: L2 Norm</h4>
+                        <p><strong>Sum of Squared Differences.</strong> It measures the pixel by pixel distance between two images. The goal is to make this value as small as possible.</p>
+                    </div>
+                    <div class="comparison-item">
+                        <h4> Metric: NCC</h4>
+                        <p><strong>Normalized Cross-Correlation.</strong> It measures how well the images match using a dot product. The goal is to make this value as large as possible.</p>
+                    </div>
+                </div>
+
+                <h3>My Design Decisions</h3>
+                
+                <div class="highlight-box">
+                    <h4><strong>Green vs Blue Anchor</strong></h4>
+                    <p>
+                        The assignment suggested using the <span style="color: #3a7dea; font-weight: bold;">Blue channel</span> as the reference anchor. 
+                        However, after experimentation, I found that the Blue channel often contains more noise and blur. 
+                        Switching to the <span style="color: #38a169; font-weight: bold;">Green channel</span> as the anchor significantly improved alignment quality, 
+                        especially for challenging images like emir.tif, melons.tif, and self_portrate.tif.
+                    </p>
+                    <p style="margin-top: 10px;">
+                        <strong>Result:</strong> All images shown below use <span style="color: #38a169; font-weight: bold;">Green as the anchor</span> (displacement<code>[0, 0]</code>), 
+                        with Red and Blue aligned to it.
+                    </p>
+                </div>
+            </section>
+            <section>
+                <h2>Results: Small Images (JPG)</h2>
+                <p>
+                    I aligned the images using the <span style="color: #38a169; font-weight: bold;">Green channel</span> as the anchor. 
+                    While I implemented both <span class="metric-badge">L2</span> and <span class="metric-badge">NCC</span> metrics, 
+                    they gave almost the same displacement results. For simplicity, the results below use the <strong>L2 metric</strong>.
+                </p>
+                <p>
+                    <strong>Algorithm Verification:</strong> 
+                    To check that my <strong>Pyramid Alignment</strong> works correctly, I tested small 
+                    images using both the Single-Scale and Pyramid methods. The table below shows that the pyramid method 
+                    finds the same alignment as the exhaustive search.
+                </p>
+                
+                <table style="text-align: center;">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="vertical-align: middle;">Image</th>
+                            <th colspan="2" style="border-bottom: 1px solid rgba(255,255,255,0.3);">Single-Scale Shift (y, x)</th>
+                            <th colspan="2" style="border-bottom: 1px solid rgba(255,255,255,0.3);">Pyramid Shift (y, x)</th>
+                        </tr>
+                        <tr>
+                            <th>Red</th>
+                            <th>Blue</th>
+                            <th>Red</th>
+                            <th>Blue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: bold;">cathedral.jpg</td>
+                            <td>[7, 1]</td> 
+                            <td>[-5, -2]</td>
+                            <td>[7, 1]</td> 
+                            <td>[-5, -2]</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">monastery.jpg</td>
+                            <td>[6, 1]</td>
+                            <td>[3, -2]</td>
+                            <td>[6, 1]</td>
+                            <td>[3, -2]</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">tobolsk.jpg</td>
+                            <td>[4, 1]</td>
+                            <td>[-3, -3]</td>
+                            <td>[4, 1]</td>
+                            <td>[-3, -3]</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-box">
+                    <strong>Observation:</strong> Since the displacement vectors are the same, 
+                    the visual results are identical. The gallery below shows the final aligned images.
+                </div>
+
+                <div class="image-gallery-2col">
+                    <div class="image-card">
+                        <img src="assets/cathedral_l2.jpg" alt="cathedral">
+                        <p>Cathedral - Aligned</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/monastery_l2.jpg" alt="monastery">
+                        <p>Monastery - Aligned</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/tobolsk_l2.jpg" alt="tobolsk">
+                        <p>Tobolsk - Aligned</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Results: Large Images (TIF)</h2>
+                <p>
+                    Because these images are very large, exhaustive search is too slow. Therefore, I used a <strong>Coarse-to-Fine Image Pyramid</strong> method, which aligns the images much faster.
+                </p>
+                <p>
+                    As with the smaller images, I tested both <span class="metric-badge">L2</span> and <span class="metric-badge">NCC</span> metrics. 
+                    Since they gave almost identical results, the table and gallery below show the L2 results for simplicity.
+                </p>
+                <div class="highlight-box">
+                    Running <code>main.py</code> will generate all image results (including NCC) 
+                    and print the displacement vectors to the console. To keep the submission
+                    size small, I only saved and included the <strong>L2 results</strong> in the <code>assets</code> folder for this report. 
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Red Shift (y, x)</th>
+                            <th>Blue Shift (y, x)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>church.tif</td><td>[33, -8]</td><td>[-25, -4]</td></tr>
+                        <tr><td>emir.tif</td><td>[57, 17]</td><td>[-49, -24]</td></tr>
+                        <tr><td>harvesters.tif</td><td>[65, -3]</td><td>[-59, -16]</td></tr>
+                        <tr><td>icon.tif</td><td>[48, 5]</td><td>[-41, -17]</td></tr>
+                        <tr><td>italil.tif</td><td>[39, 15]</td><td>[-38, -21]</td></tr>
+                        <tr><td>lastochikino.tif</td><td>[78, -7]</td><td>[3, 2]</td></tr>
+                        <tr><td>lugano.tif</td><td>[53, -13]</td><td>[-41, 16]</td></tr>
+                        <tr><td>melons.tif</td><td>[96, 4]</td><td>[-82, -11]</td></tr>
+                        <tr><td>self_portrait.tif</td><td>[98, 8]</td><td>[-79, -29]</td></tr>
+                        <tr><td>siren.tif</td><td>[47, -18]</td><td>[-50, 6]</td></tr>
+                        <tr><td>three_generations.tif</td><td>[58, -3]</td><td>[-53, -14]</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="image-gallery-2col">
+                    <div class="image-card">
+                        <img src="assets/church_l2.jpg" alt="church">
+                        <p>Church</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/emir_l2.jpg" alt="emir">
+                        <p>Emir of Bukhara</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/harvesters_l2.jpg" alt="harvesters">
+                        <p>Harvesters</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/icon_l2.jpg" alt="icon">
+                        <p>Icon</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/italil_l2.jpg" alt="italil">
+                        <p>Italil</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/lastochikino_l2.jpg" alt="lastochikino">
+                        <p>Lastochikino</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/lugano_l2.jpg" alt="lugano">
+                        <p>Lugano</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/melons_l2.jpg" alt="melons">
+                        <p>Melons</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/self_portrait_l2.jpg" alt="self_portrait">
+                        <p>Self Portrait</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/siren_l2.jpg" alt="siren">
+                        <p>Siren</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/three_generations_l2.jpg" alt="three_generations">
+                        <p>Three Generations</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Extra Images from the Collection</h2>
+                <p>I downloaded three additional images from the Prokudin-Gorskii collection to test my algorithm.</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Red Shift (y, x)</th>
+                            <th>Blue Shift (y, x)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>krym.tif</td><td>[107, -16]</td><td>[-33, 11]</td></tr>
+                        <tr><td>peonies.tif</td><td>[54, -8]</td><td>[-51, -3]</td></tr>
+                        <tr><td>capri.tif</td><td>[46, -9]</td><td>[-33, 16]</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="image-gallery-2col">
+                    <div class="image-card">
+                        <img src="assets/krym_l2.jpg" alt="krym">
+                        <p>Krym</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/peonies_l2.jpg" alt="peonies">
+                        <p>Peonies</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/capri_l2.jpg" alt="capri">
+                        <p>Capri</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Bells & Whistles</h2>
+                <p>
+                    In addition to alignment, I implemented three extra features to to improve image quality.
+                </p>
+                
+                <h3>1. Automatic White Balance</h3>
+                <p>
+                    Many of the original glass plates have a strong color tint. 
+                    This happens because the film has aged and because of the lighting 
+                    conditions when the photos were taken in the early 1900s. To fix this, 
+                    I used the <strong>Gray World Assumption</strong> algorithm.
+                </p>
+                <p>
+                    This method assumes that the average color of a scene should be neutral gray.
+                    I compute the average intensity of each channel (R, G, B) and scale them so 
+                    their averages match. This removes the color cast and makes the image look more natural. 
+                </p>
+                <p>
+                    As shown below, the "Before" image has a strong color cast, while the "After" image has 
+                    a more natural color balance.
+                </p>
+
+                <div class="before-after">
+                    <div class="before-after-item">
+                        <h4>Before White Balance</h4>
+                        <img src="assets/self_portrait_l2.jpg" alt="church before wb">
+                    </div>
+                    <div class="before-after-item">
+                        <h4>After White Balance</h4>
+                        <img src="assets/self_portrait_l2_wb.jpg" alt="church after wb">
+                    </div>
+                </div>
+
+                <h3>2. Automatic Contrast Enhancement</h3>
+                <p>
+                    Even after white balancing, the images often look flat because their pixel values 
+                    don't use the full brightness range. To improve contrast, I use histogram stretching.
+                </p>
+                <p>
+                    Instead of stretching using the minimum and maximum values (which can be affected by noise), 
+                    I use the 2nd and 98th percentiles. I then rescale this range to cover the full [0, 1] range 
+                    and clip extreme values. This makes the image more vibrant without over saturating it.
+                </p>
+
+                <div class="before-after">
+                    <div class="before-after-item">
+                        <h4>Before Contrast</h4>
+                        <img src="assets/self_portrait_l2.jpg" alt="melons before contrast">
+                    </div>
+                    <div class="before-after-item">
+                        <h4>After Contrast</h4>
+                        <img src="assets/self_portrait_l2_final.jpg" alt="melons after contrast">
+                    </div>
+                </div>
+
+                <h3>3. Complete Processing Pipeline</h3>
+                <p>Here's the complete process, from alignment to white balancing to the final enhanced result.</p>
+
+                <h4 style="margin-top: 30px; color: #2d3748;">All Images - White Balanced</h4>
+                <div class="image-gallery-2col">
+                    <div class="image-card">
+                        <img src="assets/cathedral_l2_wb.jpg" alt="cathedral wb">
+                        <p>Cathedral - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/monastery_l2_wb.jpg" alt="monastery wb">
+                        <p>Monastery - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/tobolsk_l2_wb.jpg" alt="tobolsk wb">
+                        <p>Tobolsk - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/church_l2_wb.jpg" alt="church wb">
+                        <p>Church - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/emir_l2_wb.jpg" alt="emir wb">
+                        <p>Emir - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/harvesters_l2_wb.jpg" alt="harvesters wb">
+                        <p>Harvesters - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/icon_l2_wb.jpg" alt="icon wb">
+                        <p>Icon - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/italil_l2_wb.jpg" alt="italil wb">
+                        <p>Italil - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/lastochikino_l2_wb.jpg" alt="lastochikino wb">
+                        <p>Lastochikino - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/lugano_l2_wb.jpg" alt="lugano wb">
+                        <p>Lugano - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/melons_l2_wb.jpg" alt="melons wb">
+                        <p>Melons - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/self_portrait_l2_wb.jpg" alt="self_portrait wb">
+                        <p>Self Portrait - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/siren_l2_wb.jpg" alt="siren wb">
+                        <p>Siren - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/three_generations_l2_wb.jpg" alt="three_generations wb">
+                        <p>Three Generations - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/krym_l2_wb.jpg" alt="krym wb">
+                        <p>Krym - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/peonies_l2_wb.jpg" alt="peonies wb">
+                        <p>Peonies - White Balanced</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/capri_l2_wb.jpg" alt="capri wb">
+                        <p>Capri - White Balanced</p>
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 30px; color: #2d3748;">All Images - Final Enhanced</h4>
+                <div class="image-gallery-2col">
+                    <div class="image-card">
+                        <img src="assets/cathedral_l2_final.jpg" alt="cathedral final">
+                        <p>Cathedral - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/monastery_l2_final.jpg" alt="monastery final">
+                        <p>Monastery - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/tobolsk_l2_final.jpg" alt="tobolsk final">
+                        <p>Tobolsk - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/church_l2_final.jpg" alt="church final">
+                        <p>Church - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/emir_l2_final.jpg" alt="emir final">
+                        <p>Emir - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/harvesters_l2_final.jpg" alt="harvesters final">
+                        <p>Harvesters - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/icon_l2_final.jpg" alt="icon final">
+                        <p>Icon - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/italil_l2_final.jpg" alt="italil final">
+                        <p>Italil - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/lastochikino_l2_final.jpg" alt="lastochikino final">
+                        <p>Lastochikino - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/lugano_l2_final.jpg" alt="lugano final">
+                        <p>Lugano - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/melons_l2_final.jpg" alt="melons final">
+                        <p>Melons - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/self_portrait_l2_final.jpg" alt="self_portrait final">
+                        <p>Self Portrait - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/siren_l2_final.jpg" alt="siren final">
+                        <p>Siren - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/three_generations_l2_final.jpg" alt="three_generations final">
+                        <p>Three Generations - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/krym_l2_final.jpg" alt="krym final">
+                        <p>Krym - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/peonies_l2_final.jpg" alt="peonies final">
+                        <p>Peonies - Final</p>
+                    </div>
+                    <div class="image-card">
+                        <img src="assets/capri_l2_final.jpg" alt="capri final">
+                        <p>Capri - Final</p>
+                    </div>
+                </div>
+
+                <h3>4. Border Cropping</h3>
+                <p>
+                    My code doesn't cut every picture the same amount. Instead, it checks 
+                    the filename to decide what to do. Additionally, for <code>self_portrait.tif</code>, it cuts an extra 
+                    15% off the left side to get rid of a big black border.
+                </p>
+                <ul>
+                    <li><strong>Light Crop (6%):</strong> Most images</li>
+                    <li><strong>Standard Crop (8%):</strong> lastochikino, lugano (better borders)</li>
+                    <li><strong>Special Crop:</strong> self_portrait (15% left, 6% other sides)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Challenges and Limitations</h2>
+                
+                <div class="highlight-box">
+                    Some images like <code>harvesters.tif</code> show color fringing around people. 
+                    This is because they moved between the three exposures.
+                    My algorithm aligns the static background correctly but cannot correct for moving objects.
+                </div>
+
+                <p style="margin-top: 20px;">
+                    Overall, the alignment method worked very well. The algorithm processes each TIF image 
+                    in under 10 seconds on my machine, which is fast enough to meet the requirements. The automatic white balance 
+                    and contrast adjustments also make the final photos look much better.
+                </p>
+                <div class="highlight-box">
+                    To keep the submission small, I only put the final<strong> L2-aligned</strong> images in the
+                    <code>assets</code> folder. However, if you run <code>main.py</code>, 
+                    the code will recreate all the versions (NCC, L2, White-Balanced, final) and print 
+                    the full displacement vectors for both metrics to the console.
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
