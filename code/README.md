@@ -1,8 +1,3 @@
-# COMS 4732 Project 1: Colorizing the Prokudin-Gorskii Collection
-
-**Author:** Maddison Hoveida  
-**UNI:** mh4572
-
 ## Requirements
 
 - Python 3.7+
